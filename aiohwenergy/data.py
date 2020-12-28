@@ -1,4 +1,5 @@
 from .helpers import generate_attribute_string
+from .errors import InvalidState
 
 available_attributes = [
     "available_datapoints",
@@ -30,6 +31,8 @@ class Data():
         return generate_attribute_string(self, available_attributes)
 
     def __eq__(self, other: object) -> bool:
+        if (other == None):
+            return False
         return self._raw == other._raw
         
     @property
@@ -153,7 +156,7 @@ class Data():
     async def update(self):
         status, response = await self._request('get', 'api/v1/data')
         if status != 200 or not response:
-            return False
+            raise InvalidState
             
         self._raw = response
     
