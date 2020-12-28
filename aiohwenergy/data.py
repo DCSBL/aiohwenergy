@@ -152,9 +152,12 @@ class Data():
 
     async def update(self):
         status, response = await self._request('get', 'api/v1/data')
-        if status == 200 and response:
-            self._raw = response
-        
-            for datapoint in self._raw:
-                if datapoint not in self.available_datapoints and datapoint in available_attributes:
-                    self.available_datapoints.append(datapoint)
+        if status != 200 or not response:
+            return False
+            
+        self._raw = response
+    
+        for datapoint in self._raw:
+            if datapoint not in self.available_datapoints and datapoint in available_attributes:
+                self.available_datapoints.append(datapoint)
+        return True
