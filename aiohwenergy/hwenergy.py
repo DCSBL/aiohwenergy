@@ -58,14 +58,14 @@ class HomeWizardEnergy:
                 return
             self.device = Device(response, self.request)
             
-            if (self.device.product_type in SUPPORTED_DEVICES):
-                status, data_response = await self.request('get', 'api/v1/data')
-                if status == 200 and data_response:
-                    self.data = Data(data_response, self.request)
-                else:
-                    Logger.error("Error getting data");
+            # if (self.device.product_type in SUPPORTED_DEVICES):
+            status, data_response = await self.request('get', 'api/v1/data')
+            if status == 200 and data_response:
+                self.data = Data(data_response, self.request)
             else:
-                raise UnsupportedError(f"product_type {self.device.product_type} not supported")
+                Logger.error("Error getting data");
+            # else:
+            #     raise UnsupportedError(f"product_type {self.device.product_type} not supported")
         
     async def close(self):
         await self._clientsession.close()
