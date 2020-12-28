@@ -17,6 +17,9 @@ class Unauthorized(AiohwenergyException):
 
 class InvalidState(AiohwenergyException):
     """Raised when the device is not in the correct state to handle the request."""
+    
+class UnsupportedError(AiohwenergyException):
+    """Raised when the device is not supported from this library."""
 
 
 ERRORS = {

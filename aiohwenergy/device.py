@@ -40,6 +40,6 @@ class Device():
         return self._raw['firmware_version']
 
     async def update(self):
-        response = await self._request('get', 'api')
-        if response:
+        status, response = await self._request('get', 'api')
+        if status == 200 and response:
             self._raw = response

@@ -1,32 +1,37 @@
 from .helpers import generate_attribute_string
 
+available_attributes = [
+    "available_datapoints",
+    "smr_version",
+    "meter_model",
+    "wifi_ssid",
+    "wifi_strength",
+    "total_power_import_t1_kwh",
+    "total_power_import_t2_kwh",
+    "total_power_export_t1_kwh",
+    "total_power_export_t2_kwh",
+    "active_power_w",
+    "active_power_l1_w",
+    "active_power_l2_w",
+    "active_power_l3_w",
+    "total_gas_m3",
+    "gas_timestamp"
+]
+
 class Data():
     """Represent Device config."""
-
+    
     def __init__(self, raw, request):
         self._raw = raw
         self._request = request
+        self.available_datapoints = []
 
     def __str__(self):
-        attributes = ["smr_version",
-                      "wifi_ssid",
-                      "wifi_strength",
-                      "total_power_import_t1_kwh",
-                      "total_power_import_t2_kwh",
-                      "total_power_export_t1_kwh",
-                      "total_power_export_t2_kwh",
-                      "active_power_w",
-                      "active_power_l1_w",
-                      "active_power_l2_w",
-                      "active_power_l3_w",
-                      "total_gas_m3",
-                      "gas_timestamp"]
-                      
-        return generate_attribute_string(self, attributes)
+        return generate_attribute_string(self, available_attributes)
 
     def __eq__(self, other: object) -> bool:
         return self._raw == other._raw
-
+        
     @property
     def smr_version(self):
         """
@@ -34,6 +39,14 @@ class Data():
         Available for: HWE-P1
         """
         return self._raw['smr_version'] if 'smr_version' in self._raw else None
+        
+    @property
+    def meter_model(self):
+        """
+        SMR version of P1 meter
+        Available for: HWE-P1
+        """
+        return self._raw['meter_model'] if 'meter_model' in self._raw else None
     
     @property
     def wifi_ssid(self):
@@ -138,6 +151,10 @@ class Data():
         return self._raw['gas_timestamp'] if 'gas_timestamp' in self._raw else None
 
     async def update(self):
-        response = await self._request('get', 'api/v1/data')
-        if response:
+        status, response = await self._request('get', 'api/v1/data')
+        if status == 200 and response:
             self._raw = response
+        
+            for datapoint in self._raw:
+                if datapoint not in self.available_datapoints and datapoint in available_attributes:
+                    self.available_datapoints.append(datapoint)
