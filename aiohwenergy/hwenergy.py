@@ -58,9 +58,7 @@ class HomeWizardEnergy:
                 return
             self.device = Device(response, self.request)
             
-            if ((self.device.product_type == "HWE-P1") or
-                (self.device.product_type == "SDM230-wifi") or
-                (self.device.product_type == "SDM630-wifi")):
+            if (self.device.product_type in SUPPORTED_DEVICES):
                 status, data_response = await self.request('get', 'api/v1/data')
                 if status == 200 and data_response:
                     self.data = Data(data_response, self.request)
