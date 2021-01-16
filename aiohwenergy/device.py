@@ -12,6 +12,8 @@ class Device():
         return generate_attribute_string(self, attributes)
 
     def __eq__(self, other: object) -> bool:
+        if (other == None):
+            return False
         return self._raw == other._raw
 
     @property
