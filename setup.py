@@ -23,16 +23,16 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.0.5',
+    version='0.0.6',
 
     description='Asyncio package to communicate with a HomeWizard Energy Device.',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/unsigus/aiohwenergy',
+    url='https://github.com/DSBCL/aiohwenergy',
 
     # Author details
-    author='D. Sebel',
+    author='DCSBL',
     author_email='d.sebel@homewizard.nl',
 
     # Choose your license
