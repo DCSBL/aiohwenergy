@@ -19,6 +19,9 @@ async def main(args):
     print(device.device.serial)
     
     print(device.data)
+    print(device.state)
+    
+    print(await device.state.set(power_on=False))
     
     # Close connection
     await device.close()

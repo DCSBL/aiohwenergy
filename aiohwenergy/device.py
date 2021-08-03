@@ -3,8 +3,7 @@ from .helpers import generate_attribute_string
 class Device():
     """Represent Device config."""
 
-    def __init__(self, raw, request):
-        self._raw = raw
+    def __init__(self, request):
         self._request = request
 
     def __str__(self):
@@ -45,3 +44,6 @@ class Device():
         status, response = await self._request('get', 'api')
         if status == 200 and response:
             self._raw = response
+            return True
+            
+        return False

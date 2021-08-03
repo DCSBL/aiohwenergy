@@ -4,6 +4,7 @@ import aiohttp
 
 from .device import Device
 from .data import Data
+from .state import State
 from .errors import raise_error, RequestError, UnsupportedError
 
 Logger = logging.getLogger(__name__)
@@ -14,6 +15,7 @@ SUPPORTED_DEVICES = [
     "HWE-P1",
     "SDM230-wifi",
     "SDM630-wifi",
+    "HWE-SKT"
 ]
 
 class HomeWizardEnergy:
@@ -27,6 +29,7 @@ class HomeWizardEnergy:
         # Endpoints
         self.data = None
         self.device = None
+        self.state = None
 
     async def __aenter__(self):
         return self
@@ -51,21 +54,32 @@ class HomeWizardEnergy:
 
     async def update(self):
         Logger.debug("hwenergy update")
-        status, response = await self.request('get', 'api')
-        if status == 200 and response:
-            if (response['api_version'] != SUPPORTED_API_VERSION):
+        
+        self.device = Device(self.request)
+        status = await self.device.update()
+        if (status):
+            
+            # Validate 'device'
+            if (self.device.api_version != SUPPORTED_API_VERSION):
                 Logger.error("This library requires api to have version '%s'", SUPPORTED_API_VERSION)
                 return
-            self.device = Device(response, self.request)
+                
+            if (self.device.product_type not in SUPPORTED_DEVICES):
+                Logger.error("Device '%s' not supported", self.device.product_type)
+                return
+                
+            # Get /data
+            self.data = Data(self.request)
+            status = await self.data.update()
+            if not status:
+                Logger.error("Failed to get 'data'")
             
-            # if (self.device.product_type in SUPPORTED_DEVICES):
-            status, data_response = await self.request('get', 'api/v1/data')
-            if status == 200 and data_response:
-                self.data = Data(data_response, self.request)
-            else:
-                Logger.error("Error getting data");
-            # else:
-            #     raise UnsupportedError(f"product_type {self.device.product_type} not supported")
+            # For HWE-SKT: Get /State
+            if (self.device.product_type == "HWE-SKT"):
+                self.state = State(self.request)
+                status = await self.state.update()
+                if not status:
+                    Logger.error("Failed to get 'state' data")
         
     async def close(self):
         await self._clientsession.close()
