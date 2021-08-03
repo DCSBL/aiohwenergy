@@ -17,7 +17,8 @@ async def main(args):
     # Use the data
     print(device.device.product_name)
     print(device.device.serial)
-    print(device.data.wifi_ssid)
+    
+    print(device.data)
     
     # Close connection
     await device.close()
