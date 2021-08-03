@@ -20,6 +20,7 @@ class State():
         return self._raw == other._raw
 
     async def set(self, power_on=None, switch_lock=None, brightness=None):
+        """Set state of device."""
         state = {}
         if isinstance(power_on, bool):
             state["power_on"] = power_on
@@ -43,17 +44,21 @@ class State():
         
     @property
     def power_on(self) -> bool:
-        """@TODO Friendly name of the device."""
+        """Returns true when device is switched on."""
         return self._raw['power_on']
 
     @property
     def switch_lock(self) -> bool:
-        """@TODO Device Type identifier."""
+        """
+        Returns true when switch_lock feature is on.
+        Switch lock forces the relay to be turned on. While switch lock is enabled,
+        you can't turn off the relay (not with the button, app or API)
+        """
         return self._raw['switch_lock']
 
     @property
     def brightness(self) -> int:
-        """@TODO hex string of the 6 byte / 12 characters device id without delimiters."""
+        """LED status brightness (0-255)."""
         return self._raw['brightness']
 
     async def update(self) -> bool:
