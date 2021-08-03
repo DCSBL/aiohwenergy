@@ -19,6 +19,7 @@ async def main(args):
     print(device.device.serial)
     
     print(device.data)
+    print(device.state)
     
     # Close connection
     await device.close()

@@ -4,6 +4,7 @@ import aiohttp
 
 from .device import Device
 from .data import Data
+from .state import State
 from .errors import raise_error, RequestError, UnsupportedError
 
 Logger = logging.getLogger(__name__)
@@ -14,6 +15,7 @@ SUPPORTED_DEVICES = [
     "HWE-P1",
     "SDM230-wifi",
     "SDM630-wifi",
+    "HWE-SKT"
 ]
 
 class HomeWizardEnergy:
@@ -27,6 +29,7 @@ class HomeWizardEnergy:
         # Endpoints
         self.data = None
         self.device = None
+        self.state = None
 
     async def __aenter__(self):
         return self
@@ -63,9 +66,15 @@ class HomeWizardEnergy:
             if status == 200 and data_response:
                 self.data = Data(data_response, self.request)
             else:
-                Logger.error("Error getting data");
+                Logger.error("Error getting data")
             # else:
             #     raise UnsupportedError(f"product_type {self.device.product_type} not supported")
+            
+            if (self.device.product_type == "HWE-SKT"):
+                self.state = State(self.request)
+                status = await self.state.update()
+                if not status:
+                    Logger.error("Error getting state")
         
     async def close(self):
         await self._clientsession.close()
