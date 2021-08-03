@@ -23,8 +23,8 @@ available_attributes = [
 class Data():
     """Represent Device config."""
     
-    def __init__(self, raw, request):
-        self._raw = raw
+    def __init__(self, request):
+        self._raw = None
         self._request = request
         self.available_datapoints = []
 
