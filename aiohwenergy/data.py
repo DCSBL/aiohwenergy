@@ -154,7 +154,9 @@ class Data():
         Available for: HWE-P1
         """
         if 'gas_timestamp' in self._raw:
-            
+            if self._raw['gas_timestamp'] is None:
+                return None
+                
             date = datetime.strptime(str(self._raw['gas_timestamp']), '%y%m%d%H%M%S')
             return date.isoformat()
         # return self._raw['gas_timestamp'] if 'gas_timestamp' in self._raw else None
