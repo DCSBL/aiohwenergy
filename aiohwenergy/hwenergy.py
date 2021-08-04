@@ -76,17 +76,25 @@ class HomeWizardEnergy:
                 if not status:
                     Logger.error("Failed to get 'state' data")
 
-    async def update(self):
+    async def update(self) -> bool:
         Logger.debug("hwenergy update")
         
         if (self.device is not None):
-            await self.device.update()
+            status = await self.device.update()
+            if not status:
+                return False
             
         if (self.data is not None):
-            await self.data.update()
+            status = await self.data.update()
+            if not status:
+                return False
             
         if (self.state is not None):
-            await self.state.update()
+            status = await self.state.update()
+            if not status:
+                return False
+                
+        return True
         
     async def close(self):
         await self._clientsession.close()
