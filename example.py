@@ -10,6 +10,7 @@ async def main(args):
     
     # Make contact with a energy device
     device = HomeWizardEnergy(args.host)
+    await device.initialize()
     
     # Update device value
     await device.update()
@@ -20,8 +21,6 @@ async def main(args):
     
     print(device.data)
     print(device.state)
-    
-    print(await device.state.set(power_on=False))
     
     # Close connection
     await device.close()
