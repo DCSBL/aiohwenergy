@@ -27,8 +27,8 @@ class HomeWizardEnergy:
         self._clientsession = self._get_clientsession()
         
         # Endpoints
-        self.data = None
         self.device = None
+        self.data = None
         self.state = None
 
     async def __aenter__(self):
@@ -50,11 +50,6 @@ class HomeWizardEnergy:
         return aiohttp.ClientSession(connector=connector)
 
     async def initialize(self):
-        await self.update()
-
-    async def update(self):
-        Logger.debug("hwenergy update")
-        
         self.device = Device(self.request)
         status = await self.device.update()
         if (status):
@@ -80,6 +75,18 @@ class HomeWizardEnergy:
                 status = await self.state.update()
                 if not status:
                     Logger.error("Failed to get 'state' data")
+
+    async def update(self):
+        Logger.debug("hwenergy update")
+        
+        if (self.device is not None):
+            await self.device.update()
+            
+        if (self.data is not None):
+            await self.data.update()
+            
+        if (self.state is not None):
+            await self.state.update()
         
     async def close(self):
         await self._clientsession.close()
