@@ -1,5 +1,6 @@
 import logging
 from .helpers import generate_attribute_string
+import json
 
 Logger = logging.getLogger(__name__)
 
@@ -39,7 +40,13 @@ class State():
             self._raw = {**self._raw, **response}
             return True, response
         
-        Logger.error("Failed to set state: %s" % response)
+        error_message = ""
+        try:
+            error_message = response["error"]["description"]
+        except (NameError, AttributeError, ValueError):
+            error_message = response
+    
+        Logger.error("Failed to set state: %s" % error_message)
         return False, response
         
     @property
