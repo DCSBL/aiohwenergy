@@ -2,7 +2,7 @@ import logging
 from .helpers import generate_attribute_string
 import json
 
-Logger = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__name__)
 
 class State():
     """Represent current state."""
@@ -31,7 +31,7 @@ class State():
             state["brightness"] = brightness
         
         if state == {}:
-            Logger.error("At least one state update is required")
+            _LOGGER.error("At least one state update is required")
             return False, ""
             
         status, response = await self._request('put', 'api/v1/state', state)
@@ -46,7 +46,7 @@ class State():
         except (NameError, AttributeError, ValueError):
             error_message = response
     
-        Logger.error("Failed to set state: %s" % error_message)
+        _LOGGER.error("Failed to set state: %s" % error_message)
         return False, response
         
     @property

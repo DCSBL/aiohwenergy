@@ -7,7 +7,7 @@ from .data import Data
 from .state import State
 from .errors import raise_error, RequestError, UnsupportedError
 
-Logger = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__name__)
 
 SUPPORTED_API_VERSION = "v1"
 
@@ -22,7 +22,7 @@ class HomeWizardEnergy:
     """Communicate with a HomeWizard Energy device."""
 
     def __init__(self, host):
-        Logger.debug("__init__ HomeWizardEnergy")
+        _LOGGER.debug("__init__ HomeWizardEnergy")
         self._host = host
         self._clientsession = self._get_clientsession()
         
@@ -56,28 +56,28 @@ class HomeWizardEnergy:
             
             # Validate 'device'
             if (self.device.api_version != SUPPORTED_API_VERSION):
-                Logger.error("This library requires api to have version '%s'", SUPPORTED_API_VERSION)
+                _LOGGER.error("This library requires api to have version '%s'", SUPPORTED_API_VERSION)
                 return
                 
             if (self.device.product_type not in SUPPORTED_DEVICES):
-                Logger.error("Device '%s' not supported", self.device.product_type)
+                _LOGGER.error("Device '%s' not supported", self.device.product_type)
                 return
                 
             # Get /data
             self.data = Data(self.request)
             status = await self.data.update()
             if not status:
-                Logger.error("Failed to get 'data'")
+                _LOGGER.error("Failed to get 'data'")
             
             # For HWE-SKT: Get /State
             if (self.device.product_type == "HWE-SKT"):
                 self.state = State(self.request)
                 status = await self.state.update()
                 if not status:
-                    Logger.error("Failed to get 'state' data")
+                    _LOGGER.error("Failed to get 'state' data")
 
     async def update(self) -> bool:
-        Logger.debug("hwenergy update")
+        _LOGGER.debug("hwenergy update")
         
         if (self.device is not None):
             status = await self.device.update()
@@ -108,13 +108,13 @@ class HomeWizardEnergy:
             return None
 
         url = f'http://{self._host}/{path}'
-        Logger.debug(f"URL: {url}")
+        _LOGGER.debug(f"URL: {url}")
 
         try:
             headers = {'Content-Type': 'application/json'}
-            Logger.debug('%s, %s, %s' % (method, url, data))
+            _LOGGER.debug('%s, %s, %s' % (method, url, data))
             async with self._clientsession.request(method, url, json=data, headers=headers) as resp:
-                Logger.debug('%s, %s' % (resp.status, await resp.text('utf-8')))
+                _LOGGER.debug('%s, %s' % (resp.status, await resp.text('utf-8')))
 
                 data = None
                 if resp.content_type == 'application/json':
