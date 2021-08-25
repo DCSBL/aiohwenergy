@@ -1,5 +1,5 @@
 from .helpers import generate_attribute_string
-from .errors import InvalidState
+from .errors import RequestError
 from datetime import datetime
 
 available_attributes = [
@@ -149,7 +149,7 @@ class Data():
     def gas_timestamp(self):
         """
         Latest gas timestamp (number)
-        Formatted as 'YYMMDDhhmmss', we will format it to ISO8601
+        Formatted as 'YYMMDDhhmmss', formatted to ISO8601
         Note: Not all DSMR meters are connected to a gas meter, so this value can be 'None'
         Available for: HWE-P1
         """
@@ -159,12 +159,12 @@ class Data():
                 
             date = datetime.strptime(str(self._raw['gas_timestamp']), '%y%m%d%H%M%S')
             return date.isoformat()
-        # return self._raw['gas_timestamp'] if 'gas_timestamp' in self._raw else None
 
     async def update(self):
         status, response = await self._request('get', 'api/v1/data')
+        
         if status != 200 or not response:
-            raise InvalidState
+            raise RequestError
             
         self._raw = response
     

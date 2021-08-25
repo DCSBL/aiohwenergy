@@ -56,12 +56,10 @@ class HomeWizardEnergy:
             
             # Validate 'device'
             if (self.device.api_version != SUPPORTED_API_VERSION):
-                _LOGGER.error("This library requires api to have version '%s'", SUPPORTED_API_VERSION)
-                return
+                raise_error(3, f"Unsupported API version, expected version '{SUPPORTED_API_VERSION}'")
                 
             if (self.device.product_type not in SUPPORTED_DEVICES):
-                _LOGGER.error("Device '%s' not supported", self.device.product_type)
-                return
+                raise_error(3, f"Unsupported device '{self.device.product_type}'")
                 
             # Get /data
             self.data = Data(self.request)
@@ -105,28 +103,23 @@ class HomeWizardEnergy:
         if self._clientsession.closed:
             # Avoid runtime errors when connection is closed.
             # This solves an issue when Updates were scheduled and HA was shutdown
-            return None
+            return -1, None
 
         url = f'http://{self._host}/{path}'
         _LOGGER.debug(f"URL: {url}")
 
-        try:
-            headers = {'Content-Type': 'application/json'}
-            _LOGGER.debug('%s, %s, %s' % (method, url, data))
-            async with self._clientsession.request(method, url, json=data, headers=headers) as resp:
-                _LOGGER.debug('%s, %s' % (resp.status, await resp.text('utf-8')))
-
-                data = None
-                if resp.content_type == 'application/json':
-                    data = await resp.json()
-                                        
-                return resp.status, data
-        except aiohttp.client_exceptions.ClientError as err:
-            raise RequestError(
-                'Error requesting data from {}: {}'.format(self._host, err)
-            ) from None
-
-
-def _raise_on_error(data):
-    """Check response for error message."""
-    raise_error(data['error']['id'], data['error']["description"])
+        headers = {'Content-Type': 'application/json'}
+        _LOGGER.debug('%s, %s, %s' % (method, url, data))
+        async with self._clientsession.request(method, url, json=data, headers=headers) as resp:
+            _LOGGER.debug('%s, %s' % (resp.status, await resp.text('utf-8')))
+            
+            if (resp.status == 401):
+                raise_error(101, "API disabled. API must be enabled in HomeWizard Energy app")
+                
+            data = None
+            if resp.content_type == 'application/json':
+                data = await resp.json()
+            else:
+                raise_error(1, "Unexpected content type")
+                                    
+            return resp.status, data
