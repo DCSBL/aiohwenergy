@@ -11,31 +11,28 @@ class RequestError(AiohwenergyException):
     Raised when host or API cannot be reached.
     """
 
-class Unauthorized(AiohwenergyException):
-    """Application is not authorized."""
+
+class InvalidStateError(AiohwenergyException):
+    """Raised when the device is not in the correct state."""
 
 
-class InvalidState(AiohwenergyException):
-    """Raised when the device is not in the correct state to handle the request."""
-    
 class UnsupportedError(AiohwenergyException):
     """Raised when the device is not supported from this library."""
 
 
+class DisabledError(AiohwenergyException):
+    """Raised when device API is disabled. User has to enable API in app."""
+
+
 ERRORS = {
-    1: Unauthorized,
-    2: Unauthorized,
-    3: Unauthorized,
-    10: RequestError,
-    11: RequestError,
-    12: RequestError,
-    13: RequestError,
-    14: RequestError,
-    15: RequestError,
-    16: InvalidState,
+    1: RequestError,
+    2: InvalidStateError,
+    3: UnsupportedError,
+    101: DisabledError,
 }
 
 
 def raise_error(code, message):
+    """Raise error based on error type."""
     cls = ERRORS.get(code, AiohwenergyException)
     raise cls("{}: {}".format(code, message))
