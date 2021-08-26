@@ -6,16 +6,26 @@ import logging
 import asyncio
 
 from aiohwenergy import HomeWizardEnergy
-
+from aiohwenergy.errors import DisabledError
 
 async def main(args):
     """Run the example."""
     # Make contact with a energy device
     device = HomeWizardEnergy(args.host)
-    await device.initialize()
+    try:
+        # Get basic data
+        await device.initialize()
 
-    # Update device value
-    await device.update()
+        # Update device value
+        await device.update()
+        
+    except DisabledError as err:
+        print(err)
+        exit()
+    
+    except:
+        print("general error")
+        exit()
 
     # Use the data
     print(device.device.product_name)
