@@ -28,7 +28,7 @@ ERRORS = {
     1: RequestError,
     2: InvalidStateError,
     3: UnsupportedError,
-    101: DisabledError,
+    51: DisabledError,
 }
 
 

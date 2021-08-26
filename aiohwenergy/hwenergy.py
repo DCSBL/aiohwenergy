@@ -109,13 +109,17 @@ class HomeWizardEnergy:
         headers = {"Content-Type": "application/json"}
         _LOGGER.debug("%s, %s, %s", method, url, data)
         async with self._clientsession.request(
-            method, url, json=data, headers=headers
+            method, url, json=data, headers=headers,
         ) as resp:
             _LOGGER.debug("%s, %s", resp.status, await resp.text("utf-8"))
-
-            if resp.status == 401:
+            
+            if resp.status == 403:
                 raise_error(
-                    101, "API disabled. API must be enabled in HomeWizard Energy app"
+                    51, "API disabled. API must be enabled in HomeWizard Energy app"
+                )
+            if (resp.status != 200):
+                raise_error(
+                    1, ("API request error (%s)" % resp.status)
                 )
 
             data = None
