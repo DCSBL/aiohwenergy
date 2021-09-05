@@ -21,7 +21,7 @@ class HomeWizardEnergy:
     def __init__(self, host):
         """Create a HomeWizard Energy object."""
         _LOGGER.debug("__init__ HomeWizardEnergy")
-        self._host = host
+        self.host = host
         self._clientsession = self._get_clientsession()
 
         # Endpoints
@@ -103,7 +103,7 @@ class HomeWizardEnergy:
             # This solves an issue when Updates were scheduled and HA was shutdown
             return -1, None
 
-        url = f"http://{self._host}/{path}"
+        url = f"http://{self.host}/{path}"
         _LOGGER.debug("URL: %s", url)
 
         headers = {"Content-Type": "application/json"}
