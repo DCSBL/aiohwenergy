@@ -1,12 +1,17 @@
 """Device represents basic information about the product."""
 
+import logging
+from typing import Coroutine
+
 from .helpers import generate_attribute_string
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Device:
     """Represent Device config."""
 
-    def __init__(self, request):
+    def __init__(self, request: Coroutine) -> None:
         """Initialize new Device object."""
         self._request = request
         self._raw = None
@@ -29,17 +34,17 @@ class Device:
         return self._raw == other._raw
 
     @property
-    def product_name(self):
+    def product_name(self) -> str:
         """Friendly name of the device."""
         return self._raw["product_name"]
 
     @property
-    def product_type(self):
+    def product_type(self) -> str:
         """Device Type identifier."""
         return self._raw["product_type"]
 
     @property
-    def serial(self):
+    def serial(self) -> str:
         """
         Return readable serial id.
 
@@ -49,12 +54,12 @@ class Device:
         return self._raw["serial"]
 
     @property
-    def api_version(self):
+    def api_version(self) -> str:
         """Return API version of the device."""
         return self._raw["api_version"]
 
     @property
-    def firmware_version(self):
+    def firmware_version(self) -> str:
         """
         User readable version of the device firmware.
 
@@ -62,10 +67,11 @@ class Device:
         """
         return self._raw["firmware_version"]
 
-    async def update(self):
+    async def update(self) -> bool:
         """Fetch new data for device."""
-        status, response = await self._request("get", "api")
-        if status == 200 and response:
-            self._raw = response
-            return True
-        return False
+        response = await self._request("get", "api")
+        if response is None:
+            return False
+
+        self._raw = response
+        return True

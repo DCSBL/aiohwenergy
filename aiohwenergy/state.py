@@ -1,6 +1,9 @@
 """State represents state of device, eg. as 'power_on'."""
+from __future__ import annotations
 
 import logging
+from typing import Coroutine
+
 from .helpers import generate_attribute_string
 
 _LOGGER = logging.getLogger(__name__)
@@ -9,7 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 class State:
     """Represent current state."""
 
-    def __init__(self, request):
+    def __init__(self, request: Coroutine):
         """Initialize new State object."""
         self._raw = None
         self._request = request
@@ -25,14 +28,19 @@ class State:
             return False
         return self._raw == other._raw
 
-    async def set(self, power_on=None, switch_lock=None, brightness=None):
+    async def set(
+        self,
+        power_on: bool | None = None,
+        switch_lock: bool | None = None,
+        brightness: int | None = None,
+    ):
         """Set state of device."""
         state = {}
-        if isinstance(power_on, bool):
+        if power_on is not None:
             state["power_on"] = power_on
-        if isinstance(switch_lock, bool):
+        if switch_lock is not None:
             state["switch_lock"] = switch_lock
-        if isinstance(brightness, int):
+        if brightness is not None:
             state["brightness"] = brightness
 
         if state == {}:
@@ -80,9 +88,9 @@ class State:
 
     async def update(self) -> bool:
         """Fetch new data for object."""
-        status, response = await self._request("get", "api/v1/state")
-        if status == 200 and response:
-            self._raw = response
-            return True
+        response = await self._request("get", "api/v1/state")
+        if response is None:
+            return False
 
-        return False
+        self._raw = response
+        return True

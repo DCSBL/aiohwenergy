@@ -3,11 +3,12 @@ Data represents measurement data for this device.
 
 It contains wifi strength and energy/gas data
 """
+from __future__ import annotations
 
 from datetime import datetime
-from .helpers import generate_attribute_string
-from .errors import RequestError
+from typing import Coroutine
 
+from .helpers import generate_attribute_string
 
 available_attributes = [
     "available_datapoints",
@@ -31,7 +32,7 @@ available_attributes = [
 class Data:
     """Represent Device config."""
 
-    def __init__(self, request):
+    def __init__(self, request: Coroutine) -> None:
         """Initialize new Data object."""
         self._raw = None
         self._request = request
@@ -48,7 +49,7 @@ class Data:
         return self._raw == other._raw
 
     @property
-    def smr_version(self):
+    def smr_version(self) -> int | None:
         """
         SMR version of P1 meter.
 
@@ -57,7 +58,7 @@ class Data:
         return self._raw["smr_version"] if "smr_version" in self._raw else None
 
     @property
-    def meter_model(self):
+    def meter_model(self) -> str | None:
         """
         SMR version of P1 meter.
 
@@ -66,7 +67,7 @@ class Data:
         return self._raw["meter_model"] if "meter_model" in self._raw else None
 
     @property
-    def wifi_ssid(self):
+    def wifi_ssid(self) -> str | None:
         """
         Wi-fi SSID currently in use (string).
 
@@ -75,7 +76,7 @@ class Data:
         return self._raw["wifi_ssid"] if "wifi_ssid" in self._raw else None
 
     @property
-    def wifi_strength(self):
+    def wifi_strength(self) -> int | None:
         """
         Wifi strength in percentage (number, 0-100), where 100 is best.
 
@@ -84,7 +85,7 @@ class Data:
         return self._raw["wifi_strength"] if "wifi_strength" in self._raw else None
 
     @property
-    def total_power_import_t1_kwh(self):
+    def total_power_import_t1_kwh(self) -> int | None:
         """
         Total power import value for counter 1 (number).
 
@@ -97,7 +98,7 @@ class Data:
         )
 
     @property
-    def total_power_import_t2_kwh(self):
+    def total_power_import_t2_kwh(self) -> int | None:
         """
         Total power import value for counter 2 (number).
 
@@ -110,7 +111,7 @@ class Data:
         )
 
     @property
-    def total_power_export_t1_kwh(self):
+    def total_power_export_t1_kwh(self) -> int | None:
         """
         Total power export value for counter 1 (number).
 
@@ -123,7 +124,7 @@ class Data:
         )
 
     @property
-    def total_power_export_t2_kwh(self):
+    def total_power_export_t2_kwh(self) -> int | None:
         """
         Total power export value for counter 2 (number).
 
@@ -136,7 +137,7 @@ class Data:
         )
 
     @property
-    def active_power_w(self):
+    def active_power_w(self) -> int | None:
         """
         Active consumption in watts (number).
 
@@ -145,7 +146,7 @@ class Data:
         return self._raw["active_power_w"] if "active_power_w" in self._raw else None
 
     @property
-    def active_power_l1_w(self):
+    def active_power_l1_w(self) -> int | None:
         """
         Active consumption in watts for line 1 (number).
 
@@ -156,7 +157,7 @@ class Data:
         )
 
     @property
-    def active_power_l2_w(self):
+    def active_power_l2_w(self) -> int | None:
         """
         Active consumption in watts for line 2 (number).
 
@@ -169,7 +170,7 @@ class Data:
         )
 
     @property
-    def active_power_l3_w(self):
+    def active_power_l3_w(self) -> int | None:
         """
         Active consumption in watts for line 3 (number).
 
@@ -182,7 +183,7 @@ class Data:
         )
 
     @property
-    def total_gas_m3(self):
+    def total_gas_m3(self) -> int | None:
         """
         Total gas usage in m3 (number).
 
@@ -192,7 +193,7 @@ class Data:
         return self._raw["total_gas_m3"] if "total_gas_m3" in self._raw else None
 
     @property
-    def gas_timestamp(self):
+    def gas_timestamp(self) -> str | None:
         """
         Latest gas timestamp (number).
 
@@ -209,12 +210,12 @@ class Data:
         date = datetime.strptime(str(self._raw["gas_timestamp"]), "%y%m%d%H%M%S")
         return date.isoformat()
 
-    async def update(self):
+    async def update(self) -> bool:
         """Fetch new data for object."""
-        status, response = await self._request("get", "api/v1/data")
+        response = await self._request("get", "api/v1/data")
 
-        if status != 200 or not response:
-            raise RequestError
+        if response is None:
+            return False
 
         self._raw = response
 
