@@ -16,7 +16,7 @@ class Device:
         self._request = request
         self._raw = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return readable string describint this object."""
         attributes = [
             "product_name",

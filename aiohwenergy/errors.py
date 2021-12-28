@@ -22,17 +22,3 @@ class UnsupportedError(AiohwenergyException):
 
 class DisabledError(AiohwenergyException):
     """Raised when device API is disabled. User has to enable API in app."""
-
-
-ERRORS = {
-    1: RequestError,
-    2: InvalidStateError,
-    3: UnsupportedError,
-    51: DisabledError,
-}
-
-
-def raise_error(code, message):
-    """Raise error based on error type."""
-    cls = ERRORS.get(code, AiohwenergyException)
-    raise cls("{}: {}".format(code, message))

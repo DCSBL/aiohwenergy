@@ -124,7 +124,7 @@ class HomeWizardEnergy:
         _LOGGER.debug("Closing clientsession")
         await self._clientsession.close()
 
-    async def request(self, method, path, data=None):
+    async def request(self, method: str, path: str, data: object = None) -> object | None:
         """Make a request to the API."""
         if self._clientsession is None:
 
