@@ -83,7 +83,7 @@ class HomeWizardEnergy:
             )
 
         if device.product_type not in SUPPORTED_DEVICES:
-            raise UnsupportedError(f"Unsupported device '{self.device.product_type}'")
+            raise UnsupportedError(f"Unsupported device '{device.product_type}'")
 
         self._device = device
 
