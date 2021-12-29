@@ -71,32 +71,39 @@ class HomeWizardEnergy:
     async def initialize(self):
         """Initialize new Device object and validate connection."""
 
-        self._device = Device(self.request)
-        if not await self.device.update():
+        device: Device = Device(self.request)
+        if not await device.update():
             _LOGGER.error("Failed to initalize API")
             return
 
         # Validate 'device'
-        if self.device.api_version != SUPPORTED_API_VERSION:
+        if device.api_version != SUPPORTED_API_VERSION:
             raise UnsupportedError(
                 f"Unsupported API version, expected version '{SUPPORTED_API_VERSION}'"
             )
 
-        if self.device.product_type not in SUPPORTED_DEVICES:
+        if device.product_type not in SUPPORTED_DEVICES:
             raise UnsupportedError(f"Unsupported device '{self.device.product_type}'")
 
+        self._device = device
+
         # Get /data
-        self._data = Data(self.request)
-        status = await self.data.update()
+        data: Data = Data(self.request)
+        status = await data.update()
         if not status:
             _LOGGER.error("Failed to get 'data'")
+        else:
+            self._data = data
 
-        # For HWE-SKT: Get /State
+        # For HWE-SKT: Get /state
         if self.device.product_type == "HWE-SKT":
-            self._state = State(self.request)
-            status = await self.state.update()
+            state: State = State(self.request)
+            status = await state.update()
             if not status:
                 _LOGGER.error("Failed to get 'state' data")
+            else:
+                self._state = state
+
 
     async def update(self) -> bool:
         """Fetch complete state for available endpoints."""
