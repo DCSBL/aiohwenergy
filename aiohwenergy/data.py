@@ -85,7 +85,7 @@ class Data:
         return self._raw["wifi_strength"] if "wifi_strength" in self._raw else None
 
     @property
-    def total_power_import_t1_kwh(self) -> int | None:
+    def total_power_import_t1_kwh(self) -> float | None:
         """
         Total power import value for counter 1 (number).
 
@@ -98,7 +98,7 @@ class Data:
         )
 
     @property
-    def total_power_import_t2_kwh(self) -> int | None:
+    def total_power_import_t2_kwh(self) -> float | None:
         """
         Total power import value for counter 2 (number).
 
@@ -111,7 +111,7 @@ class Data:
         )
 
     @property
-    def total_power_export_t1_kwh(self) -> int | None:
+    def total_power_export_t1_kwh(self) -> float | None:
         """
         Total power export value for counter 1 (number).
 
@@ -124,7 +124,7 @@ class Data:
         )
 
     @property
-    def total_power_export_t2_kwh(self) -> int | None:
+    def total_power_export_t2_kwh(self) -> float | None:
         """
         Total power export value for counter 2 (number).
 
@@ -137,7 +137,7 @@ class Data:
         )
 
     @property
-    def active_power_w(self) -> int | None:
+    def active_power_w(self) -> float | None:
         """
         Active consumption in watts (number).
 
@@ -146,7 +146,7 @@ class Data:
         return self._raw["active_power_w"] if "active_power_w" in self._raw else None
 
     @property
-    def active_power_l1_w(self) -> int | None:
+    def active_power_l1_w(self) -> float | None:
         """
         Active consumption in watts for line 1 (number).
 
@@ -157,7 +157,7 @@ class Data:
         )
 
     @property
-    def active_power_l2_w(self) -> int | None:
+    def active_power_l2_w(self) -> float | None:
         """
         Active consumption in watts for line 2 (number).
 
@@ -170,7 +170,7 @@ class Data:
         )
 
     @property
-    def active_power_l3_w(self) -> int | None:
+    def active_power_l3_w(self) -> float | None:
         """
         Active consumption in watts for line 3 (number).
 
@@ -183,7 +183,7 @@ class Data:
         )
 
     @property
-    def total_gas_m3(self) -> int | None:
+    def total_gas_m3(self) -> float | None:
         """
         Total gas usage in m3 (number).
 
