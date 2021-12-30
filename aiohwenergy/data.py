@@ -8,8 +8,6 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Coroutine
 
-from .helpers import generate_attribute_string
-
 available_attributes = [
     "available_datapoints",
     "smr_version",
@@ -37,10 +35,6 @@ class Data:
         self._raw = None
         self._request = request
         self.available_datapoints = []
-
-    def __str__(self):
-        """Return readable string describint this object."""
-        return generate_attribute_string(self, available_attributes)
 
     def __eq__(self, other: object) -> bool:
         """Return true when other object is equal to this object."""

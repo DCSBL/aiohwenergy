@@ -31,10 +31,7 @@ async def main():
         # Use the data
         print(api.device.product_name)
         print(api.device.serial)
-        print(api.device)
-
-        print(api.data)
-        print(api.state)
+        print(api.data.active_power_l1_w)
 
 
 if __name__ == "__main__":

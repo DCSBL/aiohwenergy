@@ -28,9 +28,9 @@ class HomeWizardEnergy:
         _LOGGER.debug("__init__ HomeWizardEnergy")
         self._host = host
         self._clientsession = None
-        self._device = None
-        self._data = None
-        self._state = None
+        self._device: Device | None = None
+        self._data: Data | None = None
+        self._state: State | None = None
 
     async def __aenter__(self) -> "HomeWizardEnergy":
         return self
@@ -59,7 +59,7 @@ class HomeWizardEnergy:
         return self._device
 
     @property
-    def data(self) -> Device | None:
+    def data(self) -> Data | None:
         """Return the data object."""
         return self._data
 

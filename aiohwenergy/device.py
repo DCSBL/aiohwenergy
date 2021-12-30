@@ -3,8 +3,6 @@
 import logging
 from typing import Coroutine
 
-from .helpers import generate_attribute_string
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -15,17 +13,6 @@ class Device:
         """Initialize new Device object."""
         self._request = request
         self._raw = None
-
-    def __str__(self) -> str:
-        """Return readable string describint this object."""
-        attributes = [
-            "product_name",
-            "product_type",
-            "serial",
-            "api_version",
-            "firmware_version",
-        ]
-        return generate_attribute_string(self, attributes)
 
     def __eq__(self, other: object) -> bool:
         """Return true when other object is equal to this object."""

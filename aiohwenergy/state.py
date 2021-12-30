@@ -4,8 +4,6 @@ from __future__ import annotations
 import logging
 from typing import Coroutine
 
-from .helpers import generate_attribute_string
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -16,11 +14,6 @@ class State:
         """Initialize new State object."""
         self._raw = None
         self._request = request
-
-    def __str__(self):
-        """Return readable string describint this object."""
-        attributes = ["power_on", "switch_lock", "brightness"]
-        return generate_attribute_string(self, attributes)
 
     def __eq__(self, other: object) -> bool:
         """Return true when other object is equal to this object."""
