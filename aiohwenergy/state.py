@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 from typing import Coroutine
+from .errors import RequestError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,9 +27,10 @@ class State:
         power_on: bool | None = None,
         switch_lock: bool | None = None,
         brightness: int | None = None,
-    ):
+    ) -> bool:
         """Set state of device."""
         state = {}
+
         if power_on is not None:
             state["power_on"] = power_on
         if switch_lock is not None:
@@ -38,22 +40,18 @@ class State:
 
         if state == {}:
             _LOGGER.error("At least one state update is required")
-            return False, ""
+            return False
 
-        status, response = await self._request("put", "api/v1/state", state)
-        if status == 200 and response:
-            # Zip result and original
-            self._raw = {**self._raw, **response}
-            return True, response
-
-        error_message = ""
         try:
-            error_message = response["error"]["description"]
-        except (NameError, AttributeError, ValueError):
-            error_message = response
+            response = await self._request("put", "api/v1/state", state)
+            if response is not None:
+                # Zip result and original
+                self._raw = {**self._raw, **response}
+                return True
 
-        _LOGGER.error("Failed to set state: %s", error_message)
-        return False, response
+        except RequestError:
+            _LOGGER.error("Failed to set state")
+            return False
 
     @property
     def power_on(self) -> bool:
