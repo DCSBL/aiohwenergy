@@ -20,7 +20,7 @@ setup(
     description="Python module to talk to HomeWizard Energy Devices.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_packages(exclude=["contrib", "docs", "tests"]),
+    packages=find_packages(exclude=["contrib", "docs", "test"]),
     zip_safe=True,
     install_requires=list(val.strip() for val in open("requirements.txt")),
     classifiers=[
