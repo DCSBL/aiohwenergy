@@ -38,7 +38,7 @@ class State:
         if brightness is not None:
             state["brightness"] = brightness
 
-        if not state:
+        if state == {}:
             _LOGGER.error("At least one state update is required")
             return False
 
