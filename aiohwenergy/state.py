@@ -22,6 +22,9 @@ class State:
             return False
         return self._raw == other._raw
 
+    def todict(self) -> dict:
+        return self._raw
+
     async def set(
         self,
         power_on: bool | None = None,

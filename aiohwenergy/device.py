@@ -20,6 +20,9 @@ class Device:
             return False
         return self._raw == other._raw
 
+    def todict(self) -> dict:
+        return self._raw
+
     @property
     def product_name(self) -> str:
         """Friendly name of the device."""

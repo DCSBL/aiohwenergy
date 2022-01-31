@@ -42,6 +42,9 @@ class Data:
             return False
         return self._raw == other._raw
 
+    def todict(self) -> dict:
+        return self._raw
+
     @property
     def smr_version(self) -> int | None:
         """
