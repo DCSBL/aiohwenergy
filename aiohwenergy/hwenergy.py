@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 import logging
-from types import TracebackType
-from typing import Optional, Type
 
-import aiohttp
+import async_timeout
+from aiohttp.client import ClientSession
 
 from .data import Data
 from .device import Device
@@ -21,32 +20,27 @@ SUPPORTED_DEVICES = ["HWE-P1", "SDM230-wifi", "SDM630-wifi", "HWE-SKT"]
 class HomeWizardEnergy:
     """Communicate with a HomeWizard Energy device."""
 
-    _clientsession: aiohttp.TCPConnector | None
+    _session: ClientSession | None
+    _device: Device | None = None
+    _data: Data | None = None
+    _state: State | None = None
 
-    def __init__(self, host: str):
+    _close_session: bool = False
+
+
+    def __init__(self, host: str, clientsession: ClientSession = None):
         """Create a HomeWizard Energy object."""
         _LOGGER.debug("__init__ HomeWizardEnergy")
-        self._host = host
-        self._clientsession = None
-        self._device: Device | None = None
-        self._data: Data | None = None
-        self._state: State | None = None
 
-    async def __aenter__(self) -> "HomeWizardEnergy":
+        self._host = host
+        self._session = clientsession
+
+    async def __aenter__(self) -> HomeWizardEnergy:
         return self
 
-    async def __aexit__(
-        self,
-        exc_type: Type[BaseException],
-        exc_val: BaseException,
-        exc_tb: TracebackType,
-    ) -> Optional[bool]:
+    async def __aexit__(self, *_exc_info) -> None:
         """Exit context manager."""
-        if self._clientsession is not None:
-            await self.close()
-        if exc_val:
-            raise exc_val
-        return exc_type
+        await self.close()
 
     @property
     def host(self) -> str:
@@ -126,45 +120,45 @@ class HomeWizardEnergy:
 
         return True
 
-    async def close(self):
-        """Close client session."""
-        _LOGGER.debug("Closing clientsession")
-        await self._clientsession.close()
-
     async def request(self, method: str, path: str, data: object = None) -> object | None:
         """Make a request to the API."""
-        if self._clientsession is None:
-
-            connector = aiohttp.TCPConnector(
-                enable_cleanup_closed=True,
-                limit_per_host=1,
-            )
-            self._clientsession = aiohttp.ClientSession(connector=connector)
+        if self._session is None:
+            self._session = ClientSession()
+            self._close_session = True
 
         url = f"http://{self.host}/{path}"
         headers = {"Content-Type": "application/json"}
 
         _LOGGER.debug("%s, %s, %s", method, url, data)
 
-        async with self._clientsession.request(
-            method,
-            url,
-            json=data,
-            headers=headers,
-        ) as resp:
+        async with async_timeout.timeout(8):
+            resp = await self._session.request(
+                method,
+                url,
+                json=data,
+                headers=headers,
+            )
             _LOGGER.debug("%s, %s", resp.status, await resp.text("utf-8"))
 
-            if resp.status == 403:
-                # Known case: API disabled
-                raise DisabledError(
-                    "API disabled. API must be enabled in HomeWizard Energy app"
-                )
-            if resp.status != 200:
-                # Something else went wrong
-                raise RequestError(f"API request error ({resp.status})")
+        if resp.status == 403:
+            # Known case: API disabled
+            raise DisabledError(
+                "API disabled. API must be enabled in HomeWizard Energy app"
+            )
 
-            data = None
-            if resp.content_type != "application/json":
-                raise RequestError("Unexpected content type")
+        if resp.status != 200:
+            # Something else went wrong
+            raise RequestError(f"API request error ({resp.status})")
 
-            return await resp.json()
+
+        content_type = resp.headers.get("Content-Type", "")
+        if "application/json" not in content_type:
+            raise RequestError("Unexpected content type")
+
+        return await resp.json()
+
+    async def close(self):
+        """Close client session."""
+        _LOGGER.debug("Closing clientsession")
+        if self._session and self._close_session:
+            await self._session.close()
