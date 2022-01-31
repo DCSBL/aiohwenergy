@@ -12,7 +12,7 @@ long_description = open("README.md").read()
 
 setup(
     name="aiohwenergy",
-    version="0.7.0",
+    version="0.8.0",
     license="Apache License 2.0",
     url="https://github.com/DCSBL/aiohwenergy",
     author="DCSBL",
